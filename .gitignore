@@ -1,0 +1,25 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environment
+.venv/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local logs
+*.log
