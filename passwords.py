@@ -16,6 +16,5 @@ def create_hash(password, salt):
         dklen=32
     )
 
-
 def compare_hash(stored_hash, new_hash):
     return hmac.compare_digest(stored_hash, new_hash)

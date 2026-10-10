@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Login System</h1>
+        <p class="subtitle">Login or Sign in.</p>
+
+        <section id="login-section" class="form-box">
+            <h2>Kirjautuminen</h2>
+
+            <form id="login-form">
+                <label for="login-username">Username</label>
+                <input
+                    id="login-username"
+                    type="text"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="login-password">Password</label>
+                <input
+                    id="login-password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p id="login-message" class="message"></p>
+
+            <p class="switch">
+                Not signed in yet?
+                <button type="button" id="show-register" class="link">
+                    Sign in
+                </button>
+            </p>
+        </section>
+
+        <section id="register-section" class="form-box" hidden>
+            <h2>Sign in</h2>
+
+            <form id="register-form">
+                <label for="register-username">Username</label>
+                <input
+                    id="register-username"
+                    type="text"
+                    minlength="3"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="register-password">Password</label>
+                <input
+                    id="register-password"
+                    type="password"
+                    minlength="12"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <label for="confirm-password">Confirm password</label>
+                <input
+                    id="confirm-password"
+                    type="password"
+                    minlength="12"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button type="submit">Create account</button>
+            </form>
+
+            <p id="register-message" class="message"></p>
+
+            <p class="switch">
+                Do you already have account?
+                <button type="button" id="show-login" class="link">
+                    Login
+                </button>
+            </p>
+        </section>
+    </main>
+
+<script>
+    const loginSection = document.getElementById("login-section");
+    const registerSection = document.getElementById("register-section");
+
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+
+    const loginMessage = document.getElementById("login-message");
+    const registerMessage = document.getElementById("register-message");
+
+    // Switch between login and registration.
+    document.getElementById("show-register").addEventListener("click", () => {
+        loginSection.hidden = true;
+        registerSection.hidden = false;
+    });
+
+    document.getElementById("show-login").addEventListener("click", () => {
+        registerSection.hidden = true;
+        loginSection.hidden = false;
+    });
+
+    // Login.
+    loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        loginMessage.textContent = "Logging in...";
+
+        const username = document.getElementById("login-username").value.trim();
+        const password = document.getElementById("login-password").value;
+
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                loginMessage.textContent = result.message;
+            } else {
+                loginMessage.textContent =
+                    result.detail || result.message || "Login failed.";
+            }
+        } catch (error) {
+            loginMessage.textContent = "Could not connect to the server.";
+            console.error("Login error:", error);
+        }
+    });
+
+    // Registration.
+    registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        registerMessage.textContent = "";
+
+        const username = document.getElementById("register-username").value.trim();
+        const password = document.getElementById("register-password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        if (password !== confirmPassword) {
+            registerMessage.textContent = "Passwords do not match.";
+            return;
+        }
+
+        registerMessage.textContent = "Creating account...";
+
+        try {
+            const response = await fetch("/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                registerMessage.textContent = result.message;
+
+                if (result.message === "Registration successful!") {
+                    registerForm.reset();
+                }
+            } else {
+                registerMessage.textContent =
+                    result.detail || result.message || "Registration failed.";
+            }
+        } catch (error) {
+            registerMessage.textContent = "Could not connect to the server.";
+            console.error("Registration error:", error);
+        }
+    });
+</script>
+</body>
+</html>
